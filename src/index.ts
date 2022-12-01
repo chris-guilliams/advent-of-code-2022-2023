@@ -27,7 +27,9 @@ export class Solution {
       }
     });
 
-    return Math.max(...calories);
+    calories = calories.sort((a, b) => a - b).reverse();
+
+    return calories[0] + calories[1] + calories[2];
   }
 }
 
