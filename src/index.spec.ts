@@ -1,12 +1,16 @@
 // @ts-ignore see https://github.com/jest-community/jest-extended#setup
 import * as matchers from "jest-extended";
+import { Solution } from './index';
 
 expect.extend(matchers);
 
-test("That's a test!", () => {
-  expect(1 + 1).toEqual(2);
+test('solve test input', () => {
+  const solution = new Solution().solve('./src/test-input.txt');
+  expect(solution).toBe(24000);
 });
 
-test("jest-extended is included", () => {
-  expect([1, 0]).toIncludeSameMembers([0, 1]);
+test('solve input', () => {
+  const solution = new Solution().solve('./src/input.txt');
+  console.log(solution);
+
 });
