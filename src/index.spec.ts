@@ -6,10 +6,11 @@ expect.extend(matchers);
 
 test('solve test input', () => {
   const solution = new Solution().solve('./src/test-input.txt');
-  expect(solution).toBe(45000);
+  expect(solution).toBe(15);
 });
 
 test('solve input', () => {
   const solution = new Solution().solve('./src/input.txt');
+  expect(solution).toBeDefined();
   console.log('The solution is: ', solution);
 });

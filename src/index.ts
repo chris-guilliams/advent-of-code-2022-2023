@@ -1,5 +1,14 @@
 const fs = require('fs')
 
+const POINTS = {
+  ROCK: 1,
+  PAPER: 2,
+  SCISSORS: 3,
+  LOSS: 0,
+  DRAW: 3,
+  WIN: 6
+};
+
 export class Solution {
   readInput(file: string): Array<string> {
     let input = fs.readFileSync(file, 'utf8' , (err, data) => {
@@ -14,22 +23,73 @@ export class Solution {
 
   solve(file: string): number {
     const lines = this.readInput(file);
-    let calories = new Array<number>();
+    let scores = new Array<number>();
     // print all lines
     let currentCalories = 0;
     lines.forEach((line) => {
-      const calorieEntry = Number(line);
-      if (calorieEntry) {
-        currentCalories += calorieEntry;
-      } else {
-        calories.push(currentCalories);
-        currentCalories = 0;
+      const game = line.split(' ');
+      if (game) {
+        scores.push(this.determineScore(game[0], game[1]));
       }
     });
 
-    calories = calories.sort((a, b) => a - b).reverse();
+    const total = scores.reduce((a, b) => a + b);
 
-    return calories[0] + calories[1] + calories[2];
+    return total;
+  }
+
+  determineScore(player1: string, player2: string): number {
+    let score = 0;
+    switch (player2) {
+      case 'X':
+        score += 1;
+        switch (player1) {
+          case 'A':
+            score += 3;
+            break;
+          case 'B':
+            score += 0;
+            break;
+          case 'C':
+            score += 6;
+            break;
+          default:
+        }
+        break;
+      case 'Y':
+        score += 2;
+        switch (player1) {
+          case 'A':
+            score += 6;
+            break;
+          case 'B':
+            score += 3;
+            break;
+          case 'C':
+            score += 0;
+            break;
+          default:
+        }
+        break;
+      case 'Z':
+        score += 3;
+        switch (player1) {
+          case 'A':
+            score += 0;
+            break;
+          case 'B':
+            score += 6;
+            break;
+          case 'C':
+            score += 3;
+            break;
+          default:
+        }
+        break;
+      default:
+    }
+
+    return score;
   }
 }
 
