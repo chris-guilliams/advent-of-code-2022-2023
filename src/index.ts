@@ -42,46 +42,46 @@ export class Solution {
     let score = 0;
     switch (player2) {
       case 'X':
-        score += 1;
+        score += 0;
         switch (player1) {
           case 'A':
             score += 3;
             break;
           case 'B':
-            score += 0;
+            score += 1;
             break;
           case 'C':
-            score += 6;
+            score += 2;
             break;
           default:
         }
         break;
       case 'Y':
-        score += 2;
+        score += 3;
         switch (player1) {
           case 'A':
-            score += 6;
+            score += 1;
             break;
           case 'B':
-            score += 3;
+            score += 2;
             break;
           case 'C':
-            score += 0;
+            score += 3;
             break;
           default:
         }
         break;
       case 'Z':
-        score += 3;
+        score += 6;
         switch (player1) {
           case 'A':
-            score += 0;
+            score += 2;
             break;
           case 'B':
-            score += 6;
+            score += 3;
             break;
           case 'C':
-            score += 3;
+            score += 1;
             break;
           default:
         }
