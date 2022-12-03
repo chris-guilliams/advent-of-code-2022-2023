@@ -26,18 +26,20 @@ export class Solution {
     let scores = new Array<number>();
     // print all lines
     let currentScore = 0;
-    lines.forEach((line) => {
+    lines.forEach((line, i) => {
       const left = line.substring(0, line.length / 2);
       const right = line.substring(line.length / 2);
 
-      for (let char of left) {
-        if (right.includes(char)) {
-          scores.push(this.getPriorityScore(char));
-          break;
+      if ((i + 1) % 3 === 0) {
+        for (let char of line) {
+          if (lines[i - 2].includes(char) && lines[i - 1].includes(char)) {
+            scores.push(this.getPriorityScore(char));
+            break;
+          }
         }
       }
     });
-
+    console.log(scores);
     const total = scores.reduce((a, b) => a + b);
 
     return total;

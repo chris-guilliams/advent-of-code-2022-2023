@@ -6,7 +6,7 @@ expect.extend(matchers);
 
 test("solve test input", () => {
   const solution = new Solution().solve("./src/test-input.txt");
-  expect(solution).toBe(157);
+  expect(solution).toBe(70);
 });
 
 test("getPriorityScore", () => {
