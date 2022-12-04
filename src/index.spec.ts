@@ -6,31 +6,13 @@ expect.extend(matchers);
 
 test("solve test input", () => {
   const solution = new Solution().solve("./src/test-input.txt");
-  expect(solution).toBe(70);
+  expect(solution).toBe(2);
 });
 
-test("getPriorityScore", () => {
+test("contains", () => {
   const solution = new Solution();
-  let score = solution.getPriorityScore("a");
-  expect(score).toBe(1);
-  score = solution.getPriorityScore("A");
-  expect(score).toBe(27);
-  score = solution.getPriorityScore("z");
-  expect(score).toBe(26);
-  score = solution.getPriorityScore("Z");
-  expect(score).toBe(52);
-  score = solution.getPriorityScore("p");
-  expect(score).toBe(16);
-  score = solution.getPriorityScore("L");
-  expect(score).toBe(38);
-  score = solution.getPriorityScore("P");
-  expect(score).toBe(42);
-  score = solution.getPriorityScore("v");
-  expect(score).toBe(22);
-  score = solution.getPriorityScore("t");
-  expect(score).toBe(20);
-  score = solution.getPriorityScore("s");
-  expect(score).toBe(19);
+  let result = solution.contains([56, 80], [9, 56]);
+  expect(result).toBeFalse();
 });
 
 test("solve input", () => {

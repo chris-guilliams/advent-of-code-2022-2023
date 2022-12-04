@@ -23,34 +23,29 @@ export class Solution {
 
   solve(file: string): number {
     const lines = this.readInput(file);
-    let scores = new Array<number>();
-    // print all lines
-    let currentScore = 0;
-    lines.forEach((line, i) => {
-      const left = line.substring(0, line.length / 2);
-      const right = line.substring(line.length / 2);
 
-      if ((i + 1) % 3 === 0) {
-        for (let char of line) {
-          if (lines[i - 2].includes(char) && lines[i - 1].includes(char)) {
-            scores.push(this.getPriorityScore(char));
-            break;
-          }
+    // print all lines
+    let fullyContainedSections = 0;
+    lines.forEach((line) => {
+      if (line) {
+        const sections = line.split(",");
+        const first = sections[0].split("-").map((value) => Number.parseInt(value));
+        const second = sections[1].split("-").map((value) => Number.parseInt(value));
+
+        const contains = this.contains(first, second);
+        if (contains) {
+          fullyContainedSections++;
         }
       }
     });
-    console.log(scores);
-    const total = scores.reduce((a, b) => a + b);
 
-    return total;
+    return fullyContainedSections;
   }
 
-  getPriorityScore(char: string): number {
-    let score = char.codePointAt(0);
-    if (score > 96) {
-      return score - 96;
-    } else {
-      return score - 38;
-    }
+  contains(first, second): boolean {
+    const firstContainsSecond = first[0] <= second[0] && first[1] >= second[1];
+    const secondContainsFirst = second[0] <= first[0] && second[1] >= first[1];
+
+    return firstContainsSecond || secondContainsFirst;
   }
 }
