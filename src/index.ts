@@ -25,27 +25,29 @@ export class Solution {
     const lines = this.readInput(file);
 
     // print all lines
-    let fullyContainedSections = 0;
+    let intersectingSections = 0;
     lines.forEach((line) => {
       if (line) {
         const sections = line.split(",");
         const first = sections[0].split("-").map((value) => Number.parseInt(value));
         const second = sections[1].split("-").map((value) => Number.parseInt(value));
 
-        const contains = this.contains(first, second);
-        if (contains) {
-          fullyContainedSections++;
+        const intersects = this.intersects(first, second);
+        if (intersects) {
+          intersectingSections++;
         }
       }
     });
 
-    return fullyContainedSections;
+    return intersectingSections;
   }
 
-  contains(first, second): boolean {
-    const firstContainsSecond = first[0] <= second[0] && first[1] >= second[1];
-    const secondContainsFirst = second[0] <= first[0] && second[1] >= first[1];
+  intersects(first, second): boolean {
+    let firstLeftInSecond = first[0] >= second[0] && first[0] <= second[1];
+    let firstRightInSecond = first[1] >= second[0] && first[1] <= second[1];
+    let secondLeftInFirst = second[0] >= first[0] && second[0] <= first[1];
+    let secondRightInFirst = second[1] >= first[0] && second[1] <= first[1];
 
-    return firstContainsSecond || secondContainsFirst;
+    return firstLeftInSecond || firstRightInSecond || secondLeftInFirst || secondRightInFirst;
   }
 }

@@ -6,13 +6,7 @@ expect.extend(matchers);
 
 test("solve test input", () => {
   const solution = new Solution().solve("./src/test-input.txt");
-  expect(solution).toBe(2);
-});
-
-test("contains", () => {
-  const solution = new Solution();
-  let result = solution.contains([56, 80], [9, 56]);
-  expect(result).toBeFalse();
+  expect(solution).toBe(4);
 });
 
 test("solve input", () => {
