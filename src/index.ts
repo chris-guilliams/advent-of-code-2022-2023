@@ -40,10 +40,12 @@ export class Solution {
         const stackToTakeFrom = Number.parseInt(segments[3]) - 1;
         const stackToMoveTo = Number.parseInt(segments[5]) - 1;
 
+        let containers = new Array<string>();
         for (let i = 0; i < amount; i++) {
-          const container = this.stacks[stackToTakeFrom].pop();
-          this.stacks[stackToMoveTo] = this.stacks[stackToMoveTo].concat(container);
+          containers.push(this.stacks[stackToTakeFrom].pop());
         }
+
+        this.stacks[stackToMoveTo] = this.stacks[stackToMoveTo].concat(containers.reverse());
       } else {
         readingInstructions = true;
       }
