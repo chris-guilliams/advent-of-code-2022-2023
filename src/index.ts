@@ -1,15 +1,14 @@
 const fs = require("fs");
 
-const POINTS = {
-  ROCK: 1,
-  PAPER: 2,
-  SCISSORS: 3,
-  LOSS: 0,
-  DRAW: 3,
-  WIN: 6,
-};
-
 export class Solution {
+  private stacks = new Array<Array<string>>();
+
+  constructor() {
+    for (let i = 0; i < 11; i++) {
+      this.stacks.push(new Array<string>());
+    }
+  }
+
   readInput(file: string): Array<string> {
     let input = fs.readFileSync(file, "utf8", (err, data) => {
       if (err) {
@@ -21,33 +20,44 @@ export class Solution {
     return input.split(/\r?\n/);
   }
 
-  solve(file: string): number {
+  solve(file: string): string {
     const lines = this.readInput(file);
 
-    // print all lines
-    let intersectingSections = 0;
-    lines.forEach((line) => {
-      if (line) {
-        const sections = line.split(",");
-        const first = sections[0].split("-").map((value) => Number.parseInt(value));
-        const second = sections[1].split("-").map((value) => Number.parseInt(value));
+    let readingInstructions = false;
 
-        const intersects = this.intersects(first, second);
-        if (intersects) {
-          intersectingSections++;
+    lines.forEach((line) => {
+      if (line && !readingInstructions) {
+        for (let i = 0; i < line.length; i++) {
+          const char = line.charAt(i);
+          if (char === "[") {
+            const stack = i / 4;
+            this.stacks[stack] = [line.charAt(i + 1)].concat(this.stacks[stack]);
+          }
         }
+      } else if (line && readingInstructions) {
+        const segments = line.split(" ");
+        const amount = Number.parseInt(segments[1]);
+        const stackToTakeFrom = Number.parseInt(segments[3]) - 1;
+        const stackToMoveTo = Number.parseInt(segments[5]) - 1;
+
+        for (let i = 0; i < amount; i++) {
+          const container = this.stacks[stackToTakeFrom].pop();
+          this.stacks[stackToMoveTo] = this.stacks[stackToMoveTo].concat(container);
+        }
+      } else {
+        readingInstructions = true;
       }
     });
 
-    return intersectingSections;
+    const answer = this.getSolution(this.getStacks());
+    return answer;
   }
 
-  intersects(first, second): boolean {
-    let firstLeftInSecond = first[0] >= second[0] && first[0] <= second[1];
-    let firstRightInSecond = first[1] >= second[0] && first[1] <= second[1];
-    let secondLeftInFirst = second[0] >= first[0] && second[0] <= first[1];
-    let secondRightInFirst = second[1] >= first[0] && second[1] <= first[1];
+  getSolution(stacks: Array<Array<string>>): string {
+    return this.stacks.map((value) => value.pop()).join("");
+  }
 
-    return firstLeftInSecond || firstRightInSecond || secondLeftInFirst || secondRightInFirst;
+  getStacks(): Array<Array<string>> {
+    return this.stacks;
   }
 }

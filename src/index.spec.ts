@@ -5,8 +5,9 @@ import { Solution } from "./index";
 expect.extend(matchers);
 
 test("solve test input", () => {
-  const solution = new Solution().solve("./src/test-input.txt");
-  expect(solution).toBe(4);
+  const solution = new Solution();
+  const answer = solution.solve("./src/test-input.txt");
+  expect(answer).toBe("CMZ");
 });
 
 test("solve input", () => {
