@@ -1,5 +1,7 @@
 const fs = require("fs");
 
+const START_OF_MARKER_LENGTH = 14;
+
 export class Solution {
   private stacks = new Array<Array<string>>();
 
@@ -30,7 +32,7 @@ export class Solution {
       if (line) {
         for (let char of line) {
           stack.unshift(char);
-          if (index >= 4) {
+          if (index >= START_OF_MARKER_LENGTH) {
             stack.pop();
           }
           index++;
@@ -45,6 +47,6 @@ export class Solution {
   }
 
   isMarker(stream: Array<string>): boolean {
-    return new Set(stream).size === 4;
+    return new Set(stream).size === START_OF_MARKER_LENGTH;
   }
 }
