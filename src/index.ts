@@ -20,46 +20,31 @@ export class Solution {
     return input.split(/\r?\n/);
   }
 
-  solve(file: string): string {
+  solve(file: string): number {
     const lines = this.readInput(file);
 
-    let readingInstructions = false;
+    let stack = new Array<string>();
+    let index = 0;
 
     lines.forEach((line) => {
-      if (line && !readingInstructions) {
-        for (let i = 0; i < line.length; i++) {
-          const char = line.charAt(i);
-          if (char === "[") {
-            const stack = i / 4;
-            this.stacks[stack] = [line.charAt(i + 1)].concat(this.stacks[stack]);
+      if (line) {
+        for (let char of line) {
+          stack.unshift(char);
+          if (index >= 4) {
+            stack.pop();
+          }
+          index++;
+          if (this.isMarker(stack)) {
+            return index;
           }
         }
-      } else if (line && readingInstructions) {
-        const segments = line.split(" ");
-        const amount = Number.parseInt(segments[1]);
-        const stackToTakeFrom = Number.parseInt(segments[3]) - 1;
-        const stackToMoveTo = Number.parseInt(segments[5]) - 1;
-
-        let containers = new Array<string>();
-        for (let i = 0; i < amount; i++) {
-          containers.push(this.stacks[stackToTakeFrom].pop());
-        }
-
-        this.stacks[stackToMoveTo] = this.stacks[stackToMoveTo].concat(containers.reverse());
-      } else {
-        readingInstructions = true;
       }
     });
 
-    const answer = this.getSolution(this.getStacks());
-    return answer;
+    return index;
   }
 
-  getSolution(stacks: Array<Array<string>>): string {
-    return this.stacks.map((value) => value.pop()).join("");
-  }
-
-  getStacks(): Array<Array<string>> {
-    return this.stacks;
+  isMarker(stream: Array<string>): boolean {
+    return new Set(stream).size === 4;
   }
 }

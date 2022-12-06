@@ -7,7 +7,15 @@ expect.extend(matchers);
 test("solve test input", () => {
   const solution = new Solution();
   const answer = solution.solve("./src/test-input.txt");
-  expect(answer).toBe("MCD");
+  expect(answer).toBe(5);
+});
+
+test("isMarker", () => {
+  const solution = new Solution();
+  let isMarker = solution.isMarker(["a", "b", "c", "d"]);
+  expect(isMarker).toBeTrue();
+  isMarker = solution.isMarker(["a", "b", "a", "d"]);
+  expect(isMarker).toBeFalse();
 });
 
 test("solve input", () => {
