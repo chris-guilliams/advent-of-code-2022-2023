@@ -1,15 +1,34 @@
 const fs = require("fs");
 
-const START_OF_MARKER_LENGTH = 14;
+type File = {
+  type: "File";
+  size: number;
+  name: string;
+};
+
+type Directory = {
+  type: "Directory";
+  size: number;
+  name: string;
+  contents: Array<Content>;
+  parent: Directory;
+};
+
+type Content = File | Directory;
 
 export class Solution {
-  private stacks = new Array<Array<string>>();
+  private fileSystem: Directory = {
+    type: "Directory",
+    size: 0,
+    name: "/",
+    contents: new Array<Content>(),
+    parent: undefined,
+  };
 
-  constructor() {
-    for (let i = 0; i < 11; i++) {
-      this.stacks.push(new Array<string>());
-    }
-  }
+  private currentDirectory: Directory = this.fileSystem;
+  private totalSizeOfSmallContents = 0;
+
+  constructor() {}
 
   readInput(file: string): Array<string> {
     let input = fs.readFileSync(file, "utf8", (err, data) => {
@@ -25,28 +44,75 @@ export class Solution {
   solve(file: string): number {
     const lines = this.readInput(file);
 
-    let stack = new Array<string>();
-    let index = 0;
-
     lines.forEach((line) => {
       if (line) {
-        for (let char of line) {
-          stack.unshift(char);
-          if (index >= START_OF_MARKER_LENGTH) {
-            stack.pop();
+        // determine what type of instruction it is
+        const commands = line.split(" ");
+        // if starts with $ it is a command
+        if (commands[0] === "$") {
+          // console.log("instruction: ", commands);
+          switch (commands[1]) {
+            case "cd":
+              switch (commands[2]) {
+                case "/":
+                  this.currentDirectory = this.fileSystem;
+                  break;
+                case "..":
+                  this.currentDirectory = this.currentDirectory.parent;
+                  break;
+                default:
+                  // console.log("changed directory from: ", this.currentDirectory, " to: ");
+                  this.currentDirectory = this.currentDirectory.contents[commands[2]] as Directory;
+              }
+              break;
+            case "ls":
+            // do nothing
           }
-          index++;
-          if (this.isMarker(stack)) {
-            return index;
+        } else {
+          if (commands[0] === "dir") {
+            const directory: Directory = {
+              type: "Directory",
+              size: 0,
+              name: commands[1],
+              contents: new Array<Content>(),
+              parent: this.currentDirectory,
+            };
+            // console.log("command:", commands);
+            this.currentDirectory.contents[directory.name] = directory;
+          } else {
+            const file = {
+              type: "File",
+              size: Number.parseInt(commands[0]),
+              name: commands[1],
+            };
+
+            let tempDirectory = this.currentDirectory;
+            this.currentDirectory.contents[file.name] = file;
+            if (tempDirectory.size <= 100000) {
+              this.totalSizeOfSmallContents -= tempDirectory.size;
+            }
+            tempDirectory.size += file.size;
+            if (tempDirectory.size <= 100000) {
+              this.totalSizeOfSmallContents += tempDirectory.size;
+            }
+
+            while (tempDirectory.parent) {
+              tempDirectory = tempDirectory.parent;
+              if (tempDirectory.size <= 100000) {
+                this.totalSizeOfSmallContents -= tempDirectory.size;
+              }
+              tempDirectory.size += file.size;
+              if (tempDirectory.size <= 100000) {
+                this.totalSizeOfSmallContents += tempDirectory.size;
+              }
+            }
           }
         }
       }
     });
 
-    return index;
-  }
-
-  isMarker(stream: Array<string>): boolean {
-    return new Set(stream).size === START_OF_MARKER_LENGTH;
+    this.currentDirectory = this.fileSystem;
+    // console.log(this.fileSystem.contents);
+    return this.totalSizeOfSmallContents;
   }
 }
