@@ -27,6 +27,7 @@ export class Solution {
 
   private currentDirectory: Directory = this.fileSystem;
   private totalSizeOfSmallContents = 0;
+  private directorySizes = new Array<number>();
 
   constructor() {}
 
@@ -111,8 +112,49 @@ export class Solution {
       }
     });
 
+    // push directory sizes as numbers to array instead of accumulating
     this.currentDirectory = this.fileSystem;
-    // console.log(this.fileSystem.contents);
-    return this.totalSizeOfSmallContents;
+    const flatDirectorySizes = this.getFlatDirectorySizes(this.fileSystem);
+    // console.log(this.directorySizes);
+
+    let sizeForDeletion = this.fileSystem.size;
+    const amountOfSpaceFree = 70000000 - this.fileSystem.size;
+    const amountOfSpaceNeeded = 30000000 - amountOfSpaceFree;
+    for (const size of this.directorySizes) {
+      if (size > amountOfSpaceNeeded && size < sizeForDeletion) {
+        sizeForDeletion = size;
+      }
+    }
+    return sizeForDeletion;
   }
+
+  private getFlatDirectorySizes(directory: Directory): Array<number> {
+    const sizes = new Array<number>();
+    // const items = directory.contents.
+
+    const tempDirectory = directory;
+    const directories = new Array<Directory>();
+    for (const child in tempDirectory.contents) {
+      const value = tempDirectory.contents[child];
+      if (value.type === "Directory") {
+        this.directorySizes.push(value.size);
+        this.getFlatDirectorySizes(value);
+      }
+    }
+    // console.log(directories);
+    while (directories.length) {
+      for (const child of directories) {
+        // const childValue = directories[child];
+        this.directorySizes.push(child.size);
+        this.getFlatDirectorySizes(child as Directory);
+      }
+    }
+    const values = directory.contents.map((value) => console.log(value));
+    // directory.contents.entries().flatMap((value) => {
+    //   console.log(value);
+    // });
+    return [];
+  }
+
+  private pushDirectorySizes(directory: Directory): void {}
 }
