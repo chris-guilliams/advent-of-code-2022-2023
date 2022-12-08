@@ -48,68 +48,66 @@ export class Solution {
   }
 
   private getVisible(forest: Array<Array<Tree>>): number {
+    let highestVisibility = 0;
     for (let x = 0; x < forest.length; x++) {
-      let tallestFromWest = -1;
       for (let y = 0; y < forest[x].length; y++) {
-        // console.log(tree.value);
-        const tree = this.forest[x][y];
-        if (tree.value > tallestFromWest) {
-          tree.visibleFromWest = true;
-          tallestFromWest = tree.value;
-          console.log("tree ", tree.value, " at: ", x, ",", y, " is visible from the east");
+        const visibility = this.calculateScenicScore(this.forest, x, y);
+        if (visibility > highestVisibility) {
+          highestVisibility = visibility;
         }
+      }
+    }
+    return highestVisibility;
+  }
+
+  private calculateScenicScore(forest: Array<Array<Tree>>, x: number, y: number): number {
+    const tree = forest[x][y];
+
+    let treesToNorth = 0;
+
+    for (let column = x - 1; column >= 0; column--) {
+      if (tree.value > forest[column][y].value) {
+        treesToNorth++;
+      } else {
+        treesToNorth++;
+        break;
       }
     }
 
-    for (let y = 0; y < forest.length; y++) {
-      let tallestFromNorth = -1;
-      for (let x = 0; x < forest[y].length; x++) {
-        // console.log(tree.value);
-        const tree = this.forest[x][y];
-        if (tree.value > tallestFromNorth) {
-          tree.visibleFromNorth = true;
-          tallestFromNorth = tree.value;
-          console.log("tree ", tree.value, " at: ", x, ",", y, " is visible from the North");
-        }
+    let treesToWest = 0;
+
+    for (let row = y - 1; row >= 0; row--) {
+      if (tree.value > forest[x][row].value) {
+        treesToWest++;
+      } else {
+        treesToWest++;
+        break;
       }
     }
 
-    for (let x = forest.length - 1; x > 0; x--) {
-      let tallestFromSouth = -1;
-      for (let y = forest[x].length - 1; y > 0; y--) {
-        // console.log(tree.value);
-        const tree = this.forest[x][y];
-        if (tree.value > tallestFromSouth) {
-          tree.visibleFromWest = true;
-          tallestFromSouth = tree.value;
-          console.log("tree ", tree.value, " at: ", x, ",", y, " is visible from the South");
-        }
+    let treesToSouth = 0;
+
+    for (let column = x + 1; column < forest.length; column++) {
+      if (tree.value > forest[column][y].value) {
+        treesToSouth++;
+      } else {
+        treesToSouth++;
+        break;
       }
     }
 
-    for (let y = forest.length - 1; y > 0; y--) {
-      let tallestFromEast = -1;
-      for (let x = forest[y].length - 1; x > 0; x--) {
-        // console.log(tree.value);
-        const tree = this.forest[x][y];
-        if (tree.value > tallestFromEast) {
-          tree.visibleFromEast = true;
-          tallestFromEast = tree.value;
-          console.log("tree ", tree.value, " at: ", x, ",", y, " is visible from the East");
-        }
+    let treesToEast = 0;
+
+    for (let row = y + 1; row < forest[y].length; row++) {
+      if (tree.value > forest[x][row].value) {
+        treesToEast++;
+      } else {
+        treesToEast++;
+        break;
       }
     }
 
-    console.log(this.forest);
-    let numberOfTreesVisible = 0;
-    for (let row of this.forest) {
-      for (let tree of row) {
-        const visible = tree.visibleFromEast || tree.visibleFromNorth || tree.visibleFromSouth || tree.visibleFromWest;
-        if (visible) {
-          numberOfTreesVisible++;
-        }
-      }
-    }
-    return numberOfTreesVisible;
+    const scenicScore = treesToNorth * treesToWest * treesToSouth * treesToEast;
+    return scenicScore;
   }
 }
