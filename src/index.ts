@@ -1,33 +1,15 @@
 const fs = require("fs");
 
-type File = {
-  type: "File";
-  size: number;
-  name: string;
+type Tree = {
+  visibleFromNorth: boolean;
+  visibleFromEast: boolean;
+  visibleFromSouth: boolean;
+  visibleFromWest: boolean;
+  value: number;
 };
-
-type Directory = {
-  type: "Directory";
-  size: number;
-  name: string;
-  contents: Array<Content>;
-  parent: Directory;
-};
-
-type Content = File | Directory;
 
 export class Solution {
-  private fileSystem: Directory = {
-    type: "Directory",
-    size: 0,
-    name: "/",
-    contents: new Array<Content>(),
-    parent: undefined,
-  };
-
-  private currentDirectory: Directory = this.fileSystem;
-  private totalSizeOfSmallContents = 0;
-  private directorySizes = new Array<number>();
+  private forest = new Array<Array<Tree>>();
 
   constructor() {}
 
@@ -45,116 +27,89 @@ export class Solution {
   solve(file: string): number {
     const lines = this.readInput(file);
 
-    lines.forEach((line) => {
+    lines.forEach((line, index) => {
       if (line) {
-        // determine what type of instruction it is
-        const commands = line.split(" ");
-        // if starts with $ it is a command
-        if (commands[0] === "$") {
-          // console.log("instruction: ", commands);
-          switch (commands[1]) {
-            case "cd":
-              switch (commands[2]) {
-                case "/":
-                  this.currentDirectory = this.fileSystem;
-                  break;
-                case "..":
-                  this.currentDirectory = this.currentDirectory.parent;
-                  break;
-                default:
-                  // console.log("changed directory from: ", this.currentDirectory, " to: ");
-                  this.currentDirectory = this.currentDirectory.contents[commands[2]] as Directory;
-              }
-              break;
-            case "ls":
-            // do nothing
-          }
-        } else {
-          if (commands[0] === "dir") {
-            const directory: Directory = {
-              type: "Directory",
-              size: 0,
-              name: commands[1],
-              contents: new Array<Content>(),
-              parent: this.currentDirectory,
-            };
-            // console.log("command:", commands);
-            this.currentDirectory.contents[directory.name] = directory;
-          } else {
-            const file = {
-              type: "File",
-              size: Number.parseInt(commands[0]),
-              name: commands[1],
-            };
-
-            let tempDirectory = this.currentDirectory;
-            this.currentDirectory.contents[file.name] = file;
-            if (tempDirectory.size <= 100000) {
-              this.totalSizeOfSmallContents -= tempDirectory.size;
-            }
-            tempDirectory.size += file.size;
-            if (tempDirectory.size <= 100000) {
-              this.totalSizeOfSmallContents += tempDirectory.size;
-            }
-
-            while (tempDirectory.parent) {
-              tempDirectory = tempDirectory.parent;
-              if (tempDirectory.size <= 100000) {
-                this.totalSizeOfSmallContents -= tempDirectory.size;
-              }
-              tempDirectory.size += file.size;
-              if (tempDirectory.size <= 100000) {
-                this.totalSizeOfSmallContents += tempDirectory.size;
-              }
-            }
-          }
+        this.forest.push(new Array<Tree>());
+        this.forest[index] = new Array<Tree>();
+        for (let i = 0; i < line.length; i++) {
+          const cell = Number.parseInt(line.charAt(i));
+          this.forest[index].push({
+            visibleFromNorth: false,
+            visibleFromEast: false,
+            visibleFromSouth: false,
+            visibleFromWest: false,
+            value: cell,
+          });
         }
       }
     });
 
-    // push directory sizes as numbers to array instead of accumulating
-    this.currentDirectory = this.fileSystem;
-    const flatDirectorySizes = this.getFlatDirectorySizes(this.fileSystem);
-    // console.log(this.directorySizes);
-
-    let sizeForDeletion = this.fileSystem.size;
-    const amountOfSpaceFree = 70000000 - this.fileSystem.size;
-    const amountOfSpaceNeeded = 30000000 - amountOfSpaceFree;
-    for (const size of this.directorySizes) {
-      if (size > amountOfSpaceNeeded && size < sizeForDeletion) {
-        sizeForDeletion = size;
-      }
-    }
-    return sizeForDeletion;
+    return this.getVisible(this.forest);
   }
 
-  private getFlatDirectorySizes(directory: Directory): Array<number> {
-    const sizes = new Array<number>();
-    // const items = directory.contents.
+  private getVisible(forest: Array<Array<Tree>>): number {
+    for (let x = 0; x < forest.length; x++) {
+      let tallestFromWest = -1;
+      for (let y = 0; y < forest[x].length; y++) {
+        // console.log(tree.value);
+        const tree = this.forest[x][y];
+        if (tree.value > tallestFromWest) {
+          tree.visibleFromWest = true;
+          tallestFromWest = tree.value;
+          console.log("tree ", tree.value, " at: ", x, ",", y, " is visible from the east");
+        }
+      }
+    }
 
-    const tempDirectory = directory;
-    const directories = new Array<Directory>();
-    for (const child in tempDirectory.contents) {
-      const value = tempDirectory.contents[child];
-      if (value.type === "Directory") {
-        this.directorySizes.push(value.size);
-        this.getFlatDirectorySizes(value);
+    for (let y = 0; y < forest.length; y++) {
+      let tallestFromNorth = -1;
+      for (let x = 0; x < forest[y].length; x++) {
+        // console.log(tree.value);
+        const tree = this.forest[x][y];
+        if (tree.value > tallestFromNorth) {
+          tree.visibleFromNorth = true;
+          tallestFromNorth = tree.value;
+          console.log("tree ", tree.value, " at: ", x, ",", y, " is visible from the North");
+        }
       }
     }
-    // console.log(directories);
-    while (directories.length) {
-      for (const child of directories) {
-        // const childValue = directories[child];
-        this.directorySizes.push(child.size);
-        this.getFlatDirectorySizes(child as Directory);
+
+    for (let x = forest.length - 1; x > 0; x--) {
+      let tallestFromSouth = -1;
+      for (let y = forest[x].length - 1; y > 0; y--) {
+        // console.log(tree.value);
+        const tree = this.forest[x][y];
+        if (tree.value > tallestFromSouth) {
+          tree.visibleFromWest = true;
+          tallestFromSouth = tree.value;
+          console.log("tree ", tree.value, " at: ", x, ",", y, " is visible from the South");
+        }
       }
     }
-    const values = directory.contents.map((value) => console.log(value));
-    // directory.contents.entries().flatMap((value) => {
-    //   console.log(value);
-    // });
-    return [];
+
+    for (let y = forest.length - 1; y > 0; y--) {
+      let tallestFromEast = -1;
+      for (let x = forest[y].length - 1; x > 0; x--) {
+        // console.log(tree.value);
+        const tree = this.forest[x][y];
+        if (tree.value > tallestFromEast) {
+          tree.visibleFromEast = true;
+          tallestFromEast = tree.value;
+          console.log("tree ", tree.value, " at: ", x, ",", y, " is visible from the East");
+        }
+      }
+    }
+
+    console.log(this.forest);
+    let numberOfTreesVisible = 0;
+    for (let row of this.forest) {
+      for (let tree of row) {
+        const visible = tree.visibleFromEast || tree.visibleFromNorth || tree.visibleFromSouth || tree.visibleFromWest;
+        if (visible) {
+          numberOfTreesVisible++;
+        }
+      }
+    }
+    return numberOfTreesVisible;
   }
-
-  private pushDirectorySizes(directory: Directory): void {}
 }
