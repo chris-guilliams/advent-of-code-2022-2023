@@ -2,4 +2,7 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  collectCoverage: true,
+  coverageReporters: ['clover', 'json', 'lcov', ['text', { skipFull: true }]],
+  coverageProvider: "v8"
 };
