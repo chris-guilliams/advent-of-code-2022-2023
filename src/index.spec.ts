@@ -7,7 +7,7 @@ expect.extend(matchers);
 test("solve test input", () => {
   const solution = new Solution();
   const answer = solution.solve("./src/test-input.txt");
-  expect(answer).toBe(15);
+  expect(answer).toBe(12);
 });
 
 test("solve input", () => {

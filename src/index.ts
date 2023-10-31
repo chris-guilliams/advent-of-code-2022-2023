@@ -8,15 +8,15 @@ const fs = require("fs");
 // Z = Win
 // Loss = 0, Tie = 3, Win = 6
 const outcomes = [
-  { round: 'A X', score: 4 },
-  { round: 'A Y', score: 8 },
-  { round: 'A Z', score: 3 },
+  { round: 'A X', score: 3 },
+  { round: 'A Y', score: 4 },
+  { round: 'A Z', score: 8 },
   { round: 'B X', score: 1 },
   { round: 'B Y', score: 5 },
   { round: 'B Z', score: 9 },
-  { round: 'C X', score: 7 },
-  { round: 'C Y', score: 2 },
-  { round: 'C Z', score: 6 },
+  { round: 'C X', score: 2 },
+  { round: 'C Y', score: 6 },
+  { round: 'C Z', score: 7 },
 ]
 
 export class Solution {
